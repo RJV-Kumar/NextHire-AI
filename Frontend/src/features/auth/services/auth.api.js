@@ -10,9 +10,10 @@ export async function register({ username, email, password }) {
         const response = await api.post('/api/auth/register', {
             username, email, password
         })
-        return response.data
+        return response.data;
     } catch (err) {
-        console.log(`[ERROR] Register API failed: ${err}`);
+       console.error(`[ERROR] Register API failed: ${err}`);
+       throw err;
     }
 }
 
@@ -21,26 +22,29 @@ export async function login({ email, password }) {
         const response = await api.post('/api/auth/login', {
             email, password
         })
-        return response.data
+        return response.data;
     } catch(err) {
-        console.log(`[ERROR] Login API failed: ${err}`);
+       console.error(`[ERROR] Login API failed: ${err}`);
+       throw err;
     }
 }
 
 export async function logout() {
     try {
         const response = await api.get('/api/auth/logout')
-        return response.data
+        return response.data;
     } catch(err) {
-        console.log(`[ERROR] Logout API failed: ${err}`);
+       console.error(`[ERROR] Logout API failed: ${err}`);
+       throw err;
     }
 }
 
 export async function getUser() {
     try {
         const response = await api.get('/api/auth/getUser')
-        return response.data
+        return response.data;
     } catch(err) {
-        console.log(`[ERROR] GetUser API failed: ${err}`);
+       console.error(`[ERROR] GetUser API failed: ${err}`);
+       throw err;
     }
 }
