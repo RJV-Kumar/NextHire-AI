@@ -12,63 +12,104 @@ Your task is to analyze a candidate profile against a job description and genera
 ========================
 CANDIDATE RESUME
 ========================
-
 ${resume || "Not Provided"}
 
 ========================
 CANDIDATE SELF DESCRIPTION
 ========================
-
 ${selfDescription || "Not Provided"}
 
 ========================
 JOB DESCRIPTION
 ========================
-
 ${jobDescription}
 
 ========================
-ADDITIONAL USER CONTEXT
+REPORT CUSTOMIZATION
 ========================
-
 ${userPrompt || "None"}
 
 ========================
-INSTRUCTIONS
+OUTPUT REQUIREMENTS
 ========================
 
-Generate:
+Return ONLY valid JSON matching this exact schema:
 
-1. matchScore
-- A number between 0 and 100
-- Reflect actual alignment between candidate and job
+{
+  "matchScore": number,
+  "summary": string,
+  "technicalQuestions": [
+    {
+      "question": string,
+      "intention": string,
+      "answer": string
+    }
+  ],
+  "behavioralQuestions": [
+    {
+      "question": string,
+      "intention": string,
+      "answer": string
+    }
+  ],
+  "skillGaps": [
+    {
+      "gap": string,
+      "severity": "low" | "medium" | "high",
+      "reason": string,
+      "recommendation": string
+    }
+  ],
+  "preparationPlan": [
+    {
+      "day": number,
+      "focus": string,
+      "tasks": [string]
+    }
+  ]
+}
 
-2. technicalQuestions
-- Generate 5 to 7 realistic technical interview questions
-- Questions should match the actual role seniority and stack
-- Include:
-  - question
-  - intention
-  - answer
+========================
+SCORING RULES
+========================
 
-3. behavioralQuestions
-- Generate 5 to 7 realistic behavioral interview questions
-- Include:
-  - question
-  - intention
-  - answer
+- 90-100 = exceptional fit
+- 75-89 = strong fit
+- 60-74 = reasonable fit
+- 40-59 = weak fit
+- below 40 = poor fit
 
-4. skillGaps
-- Identify 3 to 5 meaningful weaknesses or missing skills
-- Do NOT invent fake weaknesses
-- Use realistic industry expectations
+========================
+QUESTION RULES
+========================
 
-5. preparationPlan
-- Generate a strict 7-day preparation roadmap
-- Each day must contain:
-  - day
-  - focus
-  - tasks
+Technical Questions:
+- Generate 5 to 7 questions
+- Match actual stack and seniority
+- Questions must realistically appear in interviews
+
+Behavioral Questions:
+- Generate 5 to 7 questions
+- Use realistic hiring manager questions
+- Include strong example answers
+
+========================
+SKILL GAP RULES
+========================
+
+- Do not invent missing skills
+- Only identify gaps supported by resume or job description
+- Be direct and realistic
+
+========================
+PREPARATION PLAN
+========================
+
+Generate a strict 7-day interview preparation roadmap.
+
+Each day should contain:
+- focus
+- 3 to 5 actionable tasks
 
 ========================
 IMPORTANT RULES
