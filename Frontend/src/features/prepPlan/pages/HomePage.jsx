@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import "../style/homepage.scss"
 import { usePrepPlan } from '../hooks/usePrepPlan.js'
 import { useNavigate } from 'react-router'
 
 const HomePage = () => {
 
-    const { loading, generateReport,reports } = {}//usePrepPlan()
+    const { loading, generatePrepPlan, reports } = usePrepPlan()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
     const resumeInputRef = useRef()
@@ -14,8 +14,8 @@ const HomePage = () => {
 
     const handleGenerateReport = async () => {
         const resumeFile = resumeInputRef.current.files[ 0 ]
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        navigate(`/report/${data._id}`)
+        const data = await generatePrepPlan({ jobDescription, selfDescription, resumeFile })
+        navigate(`/reports/${data._id}`)
     }
 
     if (loading) {
@@ -123,7 +123,7 @@ const HomePage = () => {
             </div>
 
             {/* Recent Reports List */}
-            {/* {reports.length > 0 && (
+            {reports.length > 0 && (
                 <section className='recent-reports'>
                     <h2>My Recent Prep Plans</h2>
                     <ul className='reports-list'>
@@ -136,7 +136,7 @@ const HomePage = () => {
                         ))}
                     </ul>
                 </section>
-            )} */}
+            )}
 
             {/* Page Footer */}
             <footer className='page-footer'>

@@ -19,7 +19,7 @@ interviewRouter.post('/', authMiddleware.authUser, upload.single('resume'), inte
  * @description get prepPlan report by reportId
  * @access private
  */
-interviewRouter.get('/report/:reportId', authMiddleware.authUser, interviewController.getReportByIdController)
+interviewRouter.get('/reports/:reportId', authMiddleware.authUser, interviewController.getReportByIdController)
 
 
 /**

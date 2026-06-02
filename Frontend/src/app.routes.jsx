@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
         element: <Protected><HomePage /></Protected>
     },
     {
-        path: "/report/:reportId",
+        path: "/reports/:reportId",
         element: <Protected><PrepPlan /></Protected>
     }
 ])

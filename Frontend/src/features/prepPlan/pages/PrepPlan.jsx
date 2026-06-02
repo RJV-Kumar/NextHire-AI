@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import '../style/prepPlan.scss'
 import { usePrepPlan } from '../hooks/usePrepPlan.js'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 
 
@@ -59,14 +59,14 @@ const RoadMapDay = ({ day }) => (
 // ── Main Component ────────────────────────────────────────────────────────────
 const PrepPlan = () => {
     const [ activeNav, setActiveNav ] = useState('technical')
-    const { report, getReportById, loading, getResumePdf } = {} //usePrepPlan()
-    const { planId } = useParams()
+    const { report, getPrepPlanById, loading, getResumePdf } = usePrepPlan()
+    const { reportId } = useParams()
 
     useEffect(() => {
-        if (planId) {
-            //getReportById(planId)
+        if (reportId) {
+            getPrepPlanById(reportId)
         }
-    }, [planId])
+    }, [reportId])
 
 
 

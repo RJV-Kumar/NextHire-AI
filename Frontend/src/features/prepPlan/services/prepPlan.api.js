@@ -5,3 +5,30 @@ const api = axios.create({
     baseURL: apiBaseUrl,
     withCredentials:true
 })
+
+
+export const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
+    const formData = new FormData()
+    
+    formData.append('jobDescription', jobDescription)
+    formData.append('selfDescription', selfDescription)
+    formData.append('resumeFile', resumeFile)
+
+    const response = await api.post('api/prep-plan', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+
+    return response.data;
+}
+
+export const getReportById = async ({ reportId }) => {
+    const response = await api.get(`api/prep-plan/reports/${reportId}`)
+    return response.data;
+}
+
+export const getAllReports = async () => {
+    const response = await api.get(`api/prep-plan/`)
+    return response.data;
+}
