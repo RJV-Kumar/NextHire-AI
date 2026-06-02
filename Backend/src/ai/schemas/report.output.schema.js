@@ -87,6 +87,7 @@ const interviewReportOutputSchema = z.object({
     .describe(
       "7-day structured interview preparation roadmap"
     ),
+    jobTitle: z.string().describe("The title of the job for which the prep plan is generated")
 });
 
 module.exports = {
