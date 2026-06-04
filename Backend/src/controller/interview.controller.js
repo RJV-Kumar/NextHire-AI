@@ -17,7 +17,7 @@ async function generateReportController(req, res) {
         jobDescription,
     })
     const safeData = sanitizeInterviewReport(prepPlanByAi);
-    const interviewReport = await interviewReportModel.create({
+    const report = await interviewReportModel.create({
         user: req.user.id,
         resume: resumeContent.text,
         selfDescription,
@@ -27,7 +27,7 @@ async function generateReportController(req, res) {
 
     res.status(201).json({
         message: 'Interview report generated successfully',
-        interviewReport
+        report
     })
 }
 
@@ -39,12 +39,12 @@ async function generateReportController(req, res) {
 async function getReportByIdController(req, res) {
     const { reportId } = req.params
 
-    const prepPlan = await interviewReportModel.findOne({
+    const report = await interviewReportModel.findOne({
         _id: reportId,
         user: req.user.id
     })
 
-    if(!prepPlan) {
+    if(!report) {
         return res.status(404).json({
             message: `Prep plan for this report id [${reportId}] not found`
         })
@@ -52,7 +52,7 @@ async function getReportByIdController(req, res) {
 
     res.status(200).json({
         message: `Prep plan for this report id [${reportId}] found`,
-        prepPlan
+        report
     })
 }
 

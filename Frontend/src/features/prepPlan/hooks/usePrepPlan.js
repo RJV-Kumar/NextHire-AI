@@ -1,11 +1,11 @@
-import { generateReport, getAllReports, getReportById } from "../services/prepPlan.api"
+import { generateReport, getAllReports, getReportById, generateResumePdf } from "../services/prepPlan.api"
 import { useContext, useEffect } from "react"
 import { PrepPlanContext } from "../prepPlan.context"
 import { useParams } from "react-router"
 
 export const usePrepPlan = () => {
     const context = useContext(PrepPlanContext)
-    const { reportId } = useParams()
+    const { reportId } = useParams();
 
     if(!context) {
         throw new Error("usePrepPlan must be used within an PrepPlanProvider")
@@ -18,14 +18,14 @@ export const usePrepPlan = () => {
         let response = null
         try {
             response = await generateReport({ jobDescription, selfDescription, resumeFile})
-            setReport(response.interviewReport)
+            setReport(response.report)
         } catch(err) {
-           console.error(err);
+           console.error(`Error: generatePrepPlan(): ${err}`);
         } finally {
             setLoading(false)
         }
 
-        return response.interviewReport
+        return response.report
     }
 
     const getPrepPlanById = async(reportId) => {
@@ -33,13 +33,13 @@ export const usePrepPlan = () => {
         let response = null
         try {
             response = await getReportById({ reportId })
-            setReport(response.interviewReport)
+            setReport(response.report)
         } catch(err) {
-           console.error(err);
+           console.error(`Error: getPrepPlanById(): ${err}`);
         } finally {
             setLoading(false)
         }
-        return response.interviewReport
+        return response.report
     }
 
     const getAllPrepPlans = async() => {
@@ -47,29 +47,31 @@ export const usePrepPlan = () => {
         let response = null
         try {
             response = await getAllReports()
-            setReports(response.interviewReports)
+            console.log('getAllPrepPlans response: ', response)
+            setReports(response.reports)
         } catch(err) {
-           console.error(err);
+           console.error(`Error: getAllPrepPlans(): ${err}`);
         } finally {
             setLoading(false)
         }
-        return response.interviewReports
+        return response.reports
     }
 
-    const getResumePdf = async (interviewReportId) => {
+    const getResumePdf = async (reportId) => {
         setLoading(true)
         let response = null
         try {
-            response = await generateResumePdf({ interviewReportId })
+            response = await generateResumePdf({ reportId })
+            console.log('getResumePdf response: ', response)
             const url = window.URL.createObjectURL(new Blob([ response ], { type: "application/pdf" }))
             const link = document.createElement("a")
             link.href = url
-            link.setAttribute("download", `resume_${interviewReportId}.pdf`)
+            link.setAttribute("download", `resume_${reportId}.pdf`)
             document.body.appendChild(link)
             link.click()
         }
         catch (error) {
-            console.log(error)
+            console.error(`Error: getResumePdf(): ${error}`);
         } finally {
             setLoading(false)
         }
@@ -77,7 +79,7 @@ export const usePrepPlan = () => {
 
     useEffect(() => {
         if (reportId) {
-            getReportById(reportId)
+            getReportById({ reportId });
         } else {
             getAllPrepPlans()
         }
