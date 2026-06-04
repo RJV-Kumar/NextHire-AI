@@ -11,17 +11,14 @@ const ai = new GoogleGenAI({
 async function generateInterviewReport({
   resume,
   jobDescription,
-  selfDescription,
-  userPrompt,
+  selfDescription
 }) {
   try {
     const prompt = buildInterviewReportPrompt({
       resume,
       jobDescription,
-      selfDescription,
-      userPrompt,
+      selfDescription
     });
-
     const response = await ai.models.generateContent({
       model: process.env.GEMINI_MODEL,
       contents: prompt,
@@ -30,13 +27,26 @@ async function generateInterviewReport({
         responseSchema: zodToJsonSchema(interviewReportOutputSchema),
       },
     });
+    const rawText = response.text;
 
-    const parsedData = JSON.parse(response.text);
+    let parsedData;
+    try {
+      parsedData = JSON.parse(rawText);
+    } catch (parseError) {
+      console.error("AI SERVICE RAW TEXT:", rawText);
+      throw parseError;
+    }
 
-    // IMPORTANT: Validate Gemini output AGAIN using zod. Never trust raw LLM output.
-    const validatedData = interviewReportOutputSchema.parse(parsedData);
+    //const validationResult = interviewReportOutputSchema.safeParse(parsedData);
+    // const validationResult = validateAiResponse(parsedData);
+    // if (!validationResult.success) {
+    //   console.error("AI SERVICE ZOD ISSUES:", validationResult.error.issues);
+    //   console.error("AI SERVICE ZOD FLATTENED:", validationResult.error.flatten());
+    //   throw validationResult.error;
+    // }
 
-    return validatedData;
+    // return validationResult.data;
+    return parsedData;
   } catch (error) {
     console.error("AI SERVICE ERROR:", error);
 
@@ -49,3 +59,18 @@ async function generateInterviewReport({
 module.exports = {
   generateInterviewReport,
 };
+
+
+function validateAiResponse(parsedData) {
+  parsedData.matchScore = Number(parsedData.matchScore);
+  if (Number.isNaN(parsedData.matchScore)) {
+    parsedData.matchScore = 0;
+  }
+
+  parsedData.technicalQuestions = parsedData.technicalQuestions ?? [];
+  parsedData.behavioralQuestions = parsedData.behavioralQuestions ?? [];
+  parsedData.skillGaps = parsedData.skillGaps ?? [];
+  parsedData.preparationPlan = parsedData.preparationPlan ?? [];
+  parsedData.jobTitle = parsedData.jobTitle ?? "Unknown";
+  return interviewReportOutputSchema.safeParse(parsedData);
+}

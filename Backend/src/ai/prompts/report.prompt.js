@@ -1,127 +1,146 @@
 function buildInterviewReportPrompt({
   resume,
   jobDescription,
-  selfDescription,
-  userPrompt,
+  selfDescription
 }) {
   return `
 You are an expert technical interviewer, hiring manager, and career coach.
 
 Your task is to analyze a candidate profile against a job description and generate a highly realistic interview preparation report.
 
-========================
-CANDIDATE RESUME
-========================
-${resume || "Not Provided"}
+    ========================
+    STRICT OUTPUT RULES (CRITICAL)
+    ========================
+    - Every array MUST contain OBJECTS ONLY.
+    - If you return a string inside any array, the response is INVALID.
+    - NEVER simplify objects into strings.
+    - NEVER return plain question lists.
 
-========================
-CANDIDATE SELF DESCRIPTION
-========================
-${selfDescription || "Not Provided"}
+    ========================
+    HARD JSON SCHEMA
+    ========================
 
-========================
-JOB DESCRIPTION
-========================
-${jobDescription}
-
-========================
-REPORT CUSTOMIZATION
-========================
-${userPrompt || "None"}
-
-========================
-OUTPUT REQUIREMENTS
-========================
-
-Return ONLY valid JSON matching this exact schema:
-
-{
-  "matchScore": number,
-  "summary": string,
-  "technicalQuestions": [
     {
-      "question": string,
-      "intention": string,
-      "answer": string
+      "matchScore": number,
+      "jobTitle": string,
+      "technicalQuestions": [
+        {
+          "question": string,
+          "intention": string,
+          "answer": string
+        }
+      ],
+      "behavioralQuestions": [
+        {
+          "question": string,
+          "intention": string,
+          "answer": string
+        }
+      ],
+      "skillGaps": [
+        {
+          "skill": string,
+          "severity": "low" | "medium" | "high"
+        }
+      ],
+      "preparationPlan": [
+        {
+          "day": number,
+          "focus": string,
+          "tasks": [
+            string
+          ]
+        }
+      ]
     }
-  ],
-  "behavioralQuestions": [
+
+    ========================
+    CRITICAL CONSTRAINTS
+    ========================
+
+    - technicalQuestions: MUST be 5–7 OBJECTS
+    - behavioralQuestions: MUST be 5–7 OBJECTS
+    - skillGaps: MUST be 3–5 OBJECTS
+    - preparationPlan: MUST be EXACTLY 7 OBJECTS
+    - DO NOT repeat "Day X" inside focus or tasks.
+    - Day numbering is handled by the system.
+
+    NEVER reduce arrays below minimum size.
+    If unsure, generate more questions instead of fewer.
+
+    ========================
+    ANTI-FAIL RULES
+    ========================
+
+    - NEVER return:
+      "technicalQuestions": ["string", "string"]
+    - NEVER return:
+      null or undefined fields
+    - NEVER skip jobTitle
+    - NEVER omit preparationPlan
+
+    ========================
+    INPUT DATA
+    ========================
+
+    RESUME:
+    ${resume || "Not Provided"}
+
+    SELF DESCRIPTION:
+    ${selfDescription || "Not Provided"}
+
+    JOB DESCRIPTION:
+    ${jobDescription}
+
+    ========================
+    FINAL INSTRUCTION
+    ========================
+
+    Return ONLY valid JSON that strictly matches the schema above.
+    ========================
+    EXAMPLE OUTPUT (FOLLOW EXACTLY):
+    ========================
     {
-      "question": string,
-      "intention": string,
-      "answer": string
+      "matchScore": 85,
+      "jobTitle": "Backend Developer",
+      "technicalQuestions": [
+        {
+          "question": "What is Node.js event loop?",
+          "intention": "Test async understanding",
+          "answer": "Explain phases of event loop..."
+        },
+        {
+          "question": "What are middleware functions in Express?",
+          "intention": "Check backend architecture knowledge",
+          "answer": "Middleware are functions..."
+        }
+      ],
+      "behavioralQuestions": [
+        {
+          "question": "Tell me about a challenging bug you fixed",
+          "intention": "Problem-solving ability",
+          "answer": "Use STAR method..."
+        }
+      ],
+      "skillGaps": [
+        {
+          "skill": "Docker",
+          "severity": "medium"
+        }
+      ],
+      "preparationPlan": [
+        {
+          "day": 1,
+          "focus": "Node.js Event Loop"
+          "tasks": [
+            "Study event loop phases",
+            "Write async/await examples",
+            "Solve callback vs promise problems"
+          ]
+        }
+      ]
     }
-  ],
-  "skillGaps": [
-    {
-      "gap": string,
-      "severity": "low" | "medium" | "high",
-      "reason": string,
-      "recommendation": string
-    }
-  ],
-  "preparationPlan": [
-    {
-      "day": number,
-      "focus": string,
-      "tasks": [string]
-    }
-  ]
-}
-
-========================
-SCORING RULES
-========================
-
-- 90-100 = exceptional fit
-- 75-89 = strong fit
-- 60-74 = reasonable fit
-- 40-59 = weak fit
-- below 40 = poor fit
-
-========================
-QUESTION RULES
-========================
-
-Technical Questions:
-- Generate 5 to 7 questions
-- Match actual stack and seniority
-- Questions must realistically appear in interviews
-
-Behavioral Questions:
-- Generate 5 to 7 questions
-- Use realistic hiring manager questions
-- Include strong example answers
-
-========================
-SKILL GAP RULES
-========================
-
-- Do not invent missing skills
-- Only identify gaps supported by resume or job description
-- Be direct and realistic
-
-========================
-PREPARATION PLAN
-========================
-
-Generate a strict 7-day interview preparation roadmap.
-
-Each day should contain:
-- focus
-- 3 to 5 actionable tasks
-
-========================
-IMPORTANT RULES
-========================
-
-- Return ONLY valid JSON
-- Do NOT include markdown
-- Do NOT include explanations outside JSON
-- Keep answers practical and specific
-- Avoid generic advice
-- Make the report realistic and brutally honest
-`;
+    `;
 }
 
 module.exports = {
