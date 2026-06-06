@@ -1,23 +1,5 @@
 const { z } = require("zod");
 
-/**
- * SAFE number parser (kills NaN issues from LLMs)
- */
-const safeNumber = z.preprocess((val) => {
-  const num = Number(val);
-  if (Number.isNaN(num)) return 0;
-  return num;
-}, z.number().min(0).max(100));
-
-/**
- * SAFE string fallback
- */
-const safeString = (fallback = "N/A") =>
-  z.preprocess((val) => {
-    if (typeof val !== "string" || !val.trim()) return fallback;
-    return val;
-  }, z.string().min(1));
-
 const interviewReportOutputSchema = z.object({
     matchScore: z.number().describe("Overall compatibility score between candidate and job role from 0 to 100"),
     technicalQuestions: z.array(z.object({
@@ -40,8 +22,30 @@ const interviewReportOutputSchema = z.object({
         tasks: z.array(z.string()).describe("List of tasks to be done on this day to follow the preparation plan, e.g. read a specific book or article, solve a set of problems, watch a video etc.")
     })).describe("A day-wise preparation plan for the candidate to follow in order to prepare for the interview effectively"),
     jobTitle: z.string().describe("The title of the job for which the interview report is generated"),
-})
+}).strict();
+
+const resumeExperienceSchema = z.object({
+  company: z.string().min(1).describe("Company or organization name"),
+  role: z.string().min(1).describe("Job title or role held"),
+  duration: z.string().min(1).describe("Employment duration or date range"),
+  highlights: z.array(z.string().min(1)).describe("Achievement bullets for this experience")
+}).strict();
+
+const resumeProjectSchema = z.object({
+  name: z.string().min(1).describe("Project name"),
+  description: z.string().min(1).describe("Short project summary"),
+  highlights: z.array(z.string().min(1)).describe("Key contributions or outcomes for the project")
+}).strict();
+
+const resumeStructuredSchema = z.object({
+  name: z.string().min(1).describe("Candidate name"),
+  summary: z.string().min(1).describe("Professional summary for the resume"),
+  skills: z.array(z.string().min(1)).describe("Core technical and professional skills"),
+  experience: z.array(resumeExperienceSchema).describe("Work experience entries"),
+  projects: z.array(resumeProjectSchema).describe("Project entries")
+}).strict();
 
 module.exports = {
   interviewReportOutputSchema,
+  resumeStructuredSchema
 };

@@ -1,8 +1,9 @@
 const { GoogleGenAI } = require("@google/genai");
 const { zodToJsonSchema } = require("zod-to-json-schema");
 
-const { interviewReportOutputSchema } = require("../schemas/report.output.schema");
-const { buildInterviewReportPrompt } = require("../prompts/report.prompt");
+const { interviewReportOutputSchema, resumeStructuredSchema } = require("../schemas/report.output.schema");
+const { buildInterviewReportPrompt, resumeGenerationPrompt } = require("../prompts/report.prompt");
+const puppeteer = require('puppeteer');
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GEMINI_API_KEY,
@@ -56,10 +57,282 @@ async function generateInterviewReport({
   }
 }
 
+
+async function generateResumePdf({ resume, selfDescription, jobDescription }) {
+  const prompt = resumeGenerationPrompt({ resume, selfDescription, jobDescription });
+
+  try {
+    const response = await ai.models.generateContent({
+      model: process.env.GEMINI_MODEL,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: zodToJsonSchema(resumeStructuredSchema),
+      },
+    });
+
+    const parsedData = parseGeminiJson(response.text);
+    // const validationResult = resumeStructuredSchema.safeParse(parsedData);
+
+    // if (!validationResult.success) {
+    //   console.error("AI SERVICE RESUME VALIDATION ISSUES:", validationResult.error.issues);
+    //   throw new Error("Invalid resume JSON from Gemini");
+    // }
+
+    //const html = buildResumeHtml(validationResult.data);
+    const html = buildResumeHtml(parsedData);
+    const pdfBuffer = await generatePdfFromHtml(html);
+    return pdfBuffer;
+  } catch (error) {
+    console.error("AI SERVICE ERROR:", error);
+    throw new Error(
+      "Failed to generate resume PDF"
+    );
+  }
+
+
+}
+
 module.exports = {
   generateInterviewReport,
+  generateResumePdf
 };
 
+
+async function generatePdfFromHtml(htmlContent) {
+  const browser = await puppeteer.launch();
+
+  try {
+    const page = await browser.newPage();
+
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: {
+        top: "24px",
+        right: "24px",
+        bottom: "24px",
+        left: "24px"
+      }
+    });
+
+    return pdfBuffer;
+  } finally {
+    await browser.close();
+  }
+}
+
+function parseGeminiJson(rawText) {
+  const text = String(rawText || "").trim();
+  const strippedText = text
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "");
+
+  return JSON.parse(strippedText);
+}
+
+function buildResumeHtml(resume) {
+  const skillsHtml = renderSkills(resume.skills);
+  const experienceHtml = renderExperience(resume.experience);
+  const projectsHtml = renderProjects(resume.projects);
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(resume.name)} - Resume</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1f2937;
+      --muted: #4b5563;
+      --accent: #0f766e;
+      --line: #d1d5db;
+      --soft: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 36px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: #ffffff;
+      line-height: 1.5;
+    }
+
+    .resume {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .header {
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: 0.02em;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+
+    .summary {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .section {
+      margin-bottom: 22px;
+      padding-bottom: 6px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 12px;
+    }
+
+    .entry {
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .entry-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .entry-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main class="resume">
+    <section class="header">
+      <h1>${escapeHtml(resume.name)}</h1>
+      <div class="summary">${escapeHtml(resume.summary)}</div>
+    </section>
+
+    <section class="section">
+      <h2>Skills</h2>
+      ${skillsHtml}
+    </section>
+
+    <section class="section">
+      <h2>Experience</h2>
+      ${experienceHtml}
+    </section>
+
+    <section class="section">
+      <h2>Projects</h2>
+      ${projectsHtml}
+    </section>
+  </main>
+</body>
+</html>`;
+}
+
+function renderSkills(skills) {
+  if (!Array.isArray(skills) || skills.length === 0) {
+    return '<div class="summary">No skills provided.</div>';
+  }
+
+  return `<div class="chips">${skills.map((skill) => `<span class="chip">${escapeHtml(skill)}</span>`).join("")}</div>`;
+}
+
+function renderExperience(experience) {
+  if (!Array.isArray(experience) || experience.length === 0) {
+    return '<div class="summary">No experience provided.</div>';
+  }
+
+  return experience.map((item) => `
+    <article class="entry">
+      <div class="entry-title">
+        <span>${escapeHtml(item.role)} at ${escapeHtml(item.company)}</span>
+        <span>${escapeHtml(item.duration)}</span>
+      </div>
+      <ul>${renderListItems(item.highlights)}</ul>
+    </article>
+  `).join("");
+}
+
+function renderProjects(projects) {
+  if (!Array.isArray(projects) || projects.length === 0) {
+    return '<div class="summary">No projects provided.</div>';
+  }
+
+  return projects.map((item) => `
+    <article class="entry">
+      <div class="entry-title">
+        <span>${escapeHtml(item.name)}</span>
+      </div>
+      <div class="entry-meta">${escapeHtml(item.description)}</div>
+      <ul>${renderListItems(item.highlights)}</ul>
+    </article>
+  `).join("");
+}
+
+function renderListItems(items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return '<li>No details provided.</li>';
+  }
+
+  return items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 function validateAiResponse(parsedData) {
   parsedData.matchScore = Number(parsedData.matchScore);

@@ -143,6 +143,70 @@ Your task is to analyze a candidate profile against a job description and genera
     `;
 }
 
+function resumeGenerationPrompt({
+  resume,
+  selfDescription,
+  jobDescription,
+}) {
+  return `
+You are a resume writer and ATS optimization assistant.
+
+Your task is to extract and rewrite the candidate information into ONE strict JSON object.
+
+STRICT OUTPUT RULES:
+- Return ONLY valid JSON.
+- Do NOT wrap the response in markdown.
+- Do NOT include explanations or commentary.
+- Do NOT return HTML.
+- Do NOT return arrays of strings where an object is required.
+- Do NOT invent facts that are not supported by the input.
+
+INPUTS:
+
+RESUME:
+${resume || "Not provided"}
+
+SELF DESCRIPTION:
+${selfDescription || "Not provided"}
+
+JOB DESCRIPTION:
+${jobDescription || "Not provided"}
+
+OUTPUT SCHEMA:
+{
+  "name": string,
+  "summary": string,
+  "skills": [string],
+  "experience": [
+    {
+      "company": string,
+      "role": string,
+      "duration": string,
+      "highlights": [string]
+    }
+  ],
+  "projects": [
+    {
+      "name": string,
+      "description": string,
+      "highlights": [string]
+    }
+  ]
+}
+
+GUIDELINES:
+- Use only the information provided in the inputs.
+- Rewrite content into concise ATS-friendly language.
+- Keep the structure deterministic and complete.
+- If a field has no data, return an empty array for skills, experience, or projects.
+- Keep every value JSON-safe.
+
+OUTPUT:
+Return ONLY valid JSON that matches the schema exactly.
+`;
+}
+
 module.exports = {
   buildInterviewReportPrompt,
+  resumeGenerationPrompt
 };

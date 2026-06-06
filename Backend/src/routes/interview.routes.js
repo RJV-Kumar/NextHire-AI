@@ -15,7 +15,7 @@ const upload = require('../middlewares/file.middleware')
 interviewRouter.post('/', authMiddleware.authUser, upload.single('resume'), interviewController.generateReportController)
 
 /**
- * @route GET /api/ai
+ * @route GET /api/ai/reports/:reportId
  * @description get prepPlan report by reportId
  * @access private
  */
@@ -28,5 +28,12 @@ interviewRouter.get('/reports/:reportId', authMiddleware.authUser, interviewCont
  * @access private
  */
 interviewRouter.get('/', authMiddleware.authUser, interviewController.getAllReportController)
+
+/**
+ * @route GET /api/ai/resume/pdf/:reportId
+ * @description generate resume pdf for current reportid
+ * @access private
+ */
+interviewRouter.get('/resume/pdf/:reportId', authMiddleware.authUser, interviewController.generateResumePdfController)
 
 module.exports = interviewRouter;
