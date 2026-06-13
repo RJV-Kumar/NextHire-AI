@@ -1,16 +1,20 @@
-# React + Vite
+# NextHire AI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for NextHire AI, an interview preparation app that turns a job description and resume into a personalized prep plan.
 
-Currently, two official plugins are available:
+## Scripts
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `npm run dev` starts the local Vite dev server.
+- `npm run build` creates a production build.
+- `npm run lint` runs ESLint across the project.
+- `npm run preview` serves the production build locally.
 
-## React Compiler
+## Public assets
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `/public/favicon.svg` is the app favicon used in the browser tab.
+- `/public/images/portfolio/next-hire-ai-cover.svg` is a social preview and portfolio cover asset.
+- `/public/images/portfolio/next-hire-ai-thumbnail.svg` is a compact portfolio thumbnail for listings or case study cards.
 
-## Expanding the ESLint configuration
+## Branding
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The frontend title and meta description are centralized in `src/config/site.constants.js` so future brand updates stay consistent across the app shell and metadata.
