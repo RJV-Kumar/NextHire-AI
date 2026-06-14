@@ -83,31 +83,31 @@ async function getAllReportController(req, res) {
 /**
  * @description controller to handle resume generation from pdf functionality
  */
-async function generateResumePdfController(req, res) {
+async function downloadResumeController(req, res) {
   const { reportId } = req.params;
-  const report = await interviewReportModel.findById(reportId)
-  if(!report) {
+  const prepPlan = await interviewReportModel.findById(reportId)
+  if(!prepPlan) {
     return res.status(404).json({
       message: `No report found for this id: {reportId}`
     })
   }
 
-  const { resume, jobDescription, selfDescription } = report;
-  const pdfBuffer = await aiService.generateResumePdf({ resume, jobDescription, selfDescription })
+  const { resume, jobDescription, selfDescription } = prepPlan;
+  const resumePdfBuffer = await aiService.generateResume({ resume, jobDescription, selfDescription })
 
   res.set({
     "Content-Type": "application/pdf",
     "Content-Disposition": `attachment; filename=resume_${reportId}.pdf`
   })
 
-  res.send(pdfBuffer)
+  res.send(resumePdfBuffer)
 }
 
 module.exports = {
     generateReportController,
     getReportByIdController,
     getAllReportController,
-    generateResumePdfController
+    downloadResumeController
 }
 
 function sanitizeInterviewReport(data) {

@@ -1,4 +1,4 @@
-import { generateReport, getAllReports, getReportById, generateResumePdf } from "../services/prepPlan.api"
+import { generateReport, getAllReports, getReportById, downloadGeneratedResume } from "../services/prepPlan.api"
 import { useContext, useEffect } from "react"
 import { PrepPlanContext } from "../prepPlan.context"
 import { useParams } from "react-router"
@@ -57,12 +57,12 @@ export const usePrepPlan = () => {
         return response.reports
     }
 
-    const getResumePdf = async (reportId) => {
+    const downloadResume = async (reportId) => {
         setLoading(true)
         let response = null;
         try {
-            response = await generateResumePdf({ reportId })
-            console.log('getResumePdf response: ', response)
+            response = await downloadGeneratedResume({ reportId })
+            console.log('downloadResume response: ', response)
             const url = window.URL.createObjectURL(new Blob([ response ], { type: "application/pdf" }))
             const link = document.createElement("a")
             link.href = url
@@ -71,7 +71,7 @@ export const usePrepPlan = () => {
             link.click()
         }
         catch (error) {
-            console.error(`Error: getResumePdf(): ${error}`);
+            console.error(`Error: downloadResume(): ${error}`);
         } finally {
             setLoading(false)
         }
@@ -85,5 +85,5 @@ export const usePrepPlan = () => {
         }
     }, [ reportId ])
 
-    return { loading, report, reports, generatePrepPlan, getPrepPlanById, getAllPrepPlans, getResumePdf }
+    return { loading, report, reports, generatePrepPlan, getPrepPlanById, getAllPrepPlans, downloadResume }
 }

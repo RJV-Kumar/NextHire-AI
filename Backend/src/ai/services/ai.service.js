@@ -57,8 +57,8 @@ async function generateInterviewReport({
   }
 }
 
-async function generateResumePdf({ resume, selfDescription, jobDescription }) {
-  const resumePdfSchema = z.object({
+async function generateResume({ resume, selfDescription, jobDescription }) {
+  const resumeSchema = z.object({
     html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
   })
 
@@ -80,7 +80,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
       contents: prompt,
       config: {
         responseMimeType: "application/json",
-        responseSchema: zodToJsonSchema(resumePdfSchema),
+        responseSchema: zodToJsonSchema(resumeSchema),
       }
   })
 
@@ -92,7 +92,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
   return pdfBuffer
 }
 
-async function generateResumePdf2({ resume, selfDescription, jobDescription }) {
+async function generateResume2({ resume, selfDescription, jobDescription }) {
   const prompt = resumeGenerationPrompt({ resume, selfDescription, jobDescription });
 
   try {
@@ -129,7 +129,7 @@ async function generateResumePdf2({ resume, selfDescription, jobDescription }) {
 
 module.exports = {
   generateInterviewReport,
-  generateResumePdf
+  generateResume
 };
 
 

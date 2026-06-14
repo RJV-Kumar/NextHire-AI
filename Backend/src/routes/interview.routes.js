@@ -34,6 +34,6 @@ interviewRouter.get('/', authMiddleware.authUser, interviewController.getAllRepo
  * @description generate resume pdf for current reportid
  * @access private
  */
-interviewRouter.get('/resume/pdf/:reportId', authMiddleware.authUser, interviewController.generateResumePdfController)
+interviewRouter.get('/resume/pdf/:reportId', authMiddleware.authUser, interviewController.downloadResumeController)
 
 module.exports = interviewRouter;
