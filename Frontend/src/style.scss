@@ -12,6 +12,25 @@ html, body, #root {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #ff2d78 #09111e;
+}
+
+html::-webkit-scrollbar {
+    width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+    background: #0d1117;
+}
+
+html::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff2d78, #ff6b9d);
+    border-radius: 999px;
+    border: 2px solid #0d1117;
+}
+
 .highlight {
     color: #ff2a5c;
 }

@@ -1,16 +1,31 @@
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import "../style/homepage.scss"
 import { usePrepPlan } from '../hooks/usePrepPlan.js'
 import { useNavigate } from 'react-router'
+import { useAuth } from '../../auth/hooks/useAuth.js'
 
 const HomePage = () => {
 
     const { loading, generatePrepPlan, reports } = usePrepPlan()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
+    const [ profileOpen, setProfileOpen ] = useState(false)
     const resumeInputRef = useRef()
+    const profileMenuRef = useRef()
 
     const navigate = useNavigate()
+    const { handleLogout } = useAuth()
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+                setProfileOpen(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     const handleGenerateReport = async () => {
         const resumeFile = resumeInputRef.current.files[ 0 ]
@@ -18,16 +33,56 @@ const HomePage = () => {
         navigate(`/reports/${data._id}`)
     }
 
+    const handleLogoutClick = async () => {
+        setProfileOpen(false)
+        await handleLogout()
+        navigate('/login')
+    }
+
+    const handleAboutClick = () => {
+        setProfileOpen(false)
+        document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
     if (loading) {
         return (
-            <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
+            <main className='loading-screen'  style={{ color: '#9aa4b2' }}>
+                <h1>Loading...</h1>
             </main>
         )
     }
 
     return (
         <div className='home-page'>
+            <div className='home-page__topbar' ref={profileMenuRef}>
+                <div className='home-page__brand'>
+                    {/* <span className='home-page__brand-mark'>N</span> */}
+                    <div>
+                        <p>NextHire AI</p>
+                        <span>Interview prep workspace</span>
+                    </div>
+                </div>
+
+                <div className='profile-menu'>
+                    <button
+                        type='button'
+                        className='profile-menu__button'
+                        onClick={() => setProfileOpen(open => !open)}
+                        aria-expanded={profileOpen}
+                        aria-haspopup='menu'
+                        aria-label='Open profile menu'
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                    </button>
+
+                    {profileOpen && (
+                        <div className='profile-menu__dropdown' role='menu'>
+                            <button type='button' onClick={handleAboutClick}>About</button>
+                            <button type='button' onClick={handleLogoutClick}>Logout</button>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* Page Header */}
             <header className='page-header'>
@@ -137,6 +192,17 @@ const HomePage = () => {
                     </ul>
                 </section>
             )}
+
+            <section className='about-section' id='about-section'>
+                <div>
+                    <p className='about-section__eyebrow'>About NextHire AI</p>
+                    <h3>Built to turn a job post into a prep plan.</h3>
+                </div>
+                <p>
+                    NextHire AI analyses your target role, resumes, and self-description to create focused questions,
+                    a preparation roadmap, and a practical match score.
+                </p>
+            </section>
 
             {/* Page Footer */}
             <footer className='page-footer'>

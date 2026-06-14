@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import '../style/prepPlan.scss'
 import { usePrepPlan } from '../hooks/usePrepPlan.js'
 import { useParams } from 'react-router'
+import { useNavigate } from 'react-router'
 
 
 
@@ -61,6 +62,7 @@ const PrepPlan = () => {
     const [ activeNav, setActiveNav ] = useState('technical')
     const { report, getPrepPlanById, loading, downloadResume } = usePrepPlan()
     const { reportId } = useParams()
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (reportId) {
@@ -72,8 +74,8 @@ const PrepPlan = () => {
 
     if (loading || !report) {
         return (
-            <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
+            <main className='loading-screen' style={{ color: '#9aa4b2' }}>
+                <h1>Loading...</h1>
             </main>
         )
     }
@@ -90,6 +92,14 @@ const PrepPlan = () => {
                 {/* ── Left Nav ── */}
                 <nav className='interview-nav'>
                     <div className="nav-content">
+                        <button
+                            type='button'
+                            className='interview-nav__back'
+                            onClick={() => navigate('/')}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
+                            Back to Home
+                        </button>
                         <p className='interview-nav__label'>Sections</p>
                         {NAV_ITEMS.map(item => (
                             <button

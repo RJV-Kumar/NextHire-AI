@@ -24,7 +24,14 @@ const Login = () => {
     return (
         <main>
             <div className='form-container'>
-                <h1>Login</h1>
+                <div className='auth-brand'>
+                    {/* <span className='auth-brand__mark'>N</span> */}
+                    <div>
+                        <p className='auth-brand__eyebrow'>NextHire AI</p>
+                        <h1>Login</h1>
+                    </div>
+                </div>
+                <p className='auth-brand__copy'>Pick up your interview prep where you left off.</p>
 
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
@@ -41,7 +48,7 @@ const Login = () => {
                     </div>
                     <button className='button primary-button'>Login</button>
                 </form>
-                <p>Don't have an account? <Link to={"/register"}>Register</Link></p>
+                <p style={{ color: '#9aa4b2' }}>Don't have an account? <Link to={"/register"}>Register</Link></p>
             </div>
         </main>
     )

@@ -23,7 +23,14 @@ const Register = () => {
     return (
         <main>
             <div className='form-container'>
-                <h1>Register</h1>
+                <div className='auth-brand'>
+                    {/* <span className='auth-brand__mark'>NH</span> */}
+                    <div>
+                        <p className='auth-brand__eyebrow'>NextHire AI</p>
+                        <h1>Register</h1>
+                    </div>
+                </div>
+                <p className='auth-brand__copy'>Create your profile and start generating interview plans in minutes.</p>
 
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
@@ -46,7 +53,7 @@ const Register = () => {
                     </div>
                     <button className='button primary-button'>Register</button>
                 </form>
-                <p>Already have an account? <Link to={"/login"}>Login</Link></p>
+                <p style={{ color: '#9aa4b2' }}>Already have an account? <Link to={"/login"}>Login</Link></p>
             </div>
         </main>
     )
