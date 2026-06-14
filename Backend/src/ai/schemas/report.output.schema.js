@@ -45,7 +45,12 @@ const resumeStructuredSchema = z.object({
   projects: z.array(resumeProjectSchema).describe("Project entries")
 }).strict();
 
+const downloadableResumeSchema = z.object({
+  html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
+})
+
 module.exports = {
   interviewReportOutputSchema,
-  resumeStructuredSchema
+  resumeStructuredSchema,
+  downloadableResumeSchema
 };

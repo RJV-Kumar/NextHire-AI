@@ -85,7 +85,6 @@ async function getAllReportController(req, res) {
  */
 async function generateResumePdfController(req, res) {
   const { reportId } = req.params;
-  
   const report = await interviewReportModel.findById(reportId)
   if(!report) {
     return res.status(404).json({

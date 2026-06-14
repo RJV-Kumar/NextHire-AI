@@ -16,4 +16,11 @@ app.use(cors({
 app.use("/api/auth", authRouter);
 app.use("/api/prep-plan", prepPlanRouter);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 module.exports = app;

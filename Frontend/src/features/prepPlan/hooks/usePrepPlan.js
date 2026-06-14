@@ -59,7 +59,7 @@ export const usePrepPlan = () => {
 
     const getResumePdf = async (reportId) => {
         setLoading(true)
-        let response = null
+        let response = null;
         try {
             response = await generateResumePdf({ reportId })
             console.log('getResumePdf response: ', response)
