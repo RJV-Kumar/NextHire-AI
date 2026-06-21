@@ -29,8 +29,8 @@ const HomePage = () => {
 
     const handleGenerateReport = async () => {
         const resumeFile = resumeInputRef.current.files[ 0 ]
-        const data = await generatePrepPlan({ jobDescription, selfDescription, resumeFile })
-        navigate(`/reports/${data._id}`)
+        const generatedReport = await generatePrepPlan({ jobDescription, selfDescription, resumeFile })
+        navigate(`/reports/${generatedReport._id}`)
     }
 
     const handleLogoutClick = async () => {

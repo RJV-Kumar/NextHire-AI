@@ -68,7 +68,7 @@ const PrepPlan = () => {
         if (reportId) {
             getPrepPlanById(reportId)
         }
-    }, [reportId])
+    }, [ reportId, getPrepPlanById ])
 
 
 
@@ -131,8 +131,8 @@ const PrepPlan = () => {
                                 <span className='content-header__count'>{report.technicalQuestions.length} questions</span>
                             </div>
                             <div className='q-list'>
-                                {report.technicalQuestions.map((q, i) => (
-                                    <QuestionCard key={i} item={q} index={i} />
+                                {report.technicalQuestions.map((question, index) => (
+                                    <QuestionCard key={index} item={question} index={index} />
                                 ))}
                             </div>
                         </section>
@@ -145,8 +145,8 @@ const PrepPlan = () => {
                                 <span className='content-header__count'>{report.behavioralQuestions.length} questions</span>
                             </div>
                             <div className='q-list'>
-                                {report.behavioralQuestions.map((q, i) => (
-                                    <QuestionCard key={i} item={q} index={i} />
+                                {report.behavioralQuestions.map((question, index) => (
+                                    <QuestionCard key={index} item={question} index={index} />
                                 ))}
                             </div>
                         </section>
@@ -159,8 +159,8 @@ const PrepPlan = () => {
                                 <span className='content-header__count'>{report.preparationPlan.length}-day plan</span>
                             </div>
                             <div className='roadmap-list'>
-                                {report.preparationPlan.map((day) => (
-                                    <RoadMapDay key={day.day} day={day} />
+                                {report.preparationPlan.map((roadmapDay) => (
+                                    <RoadMapDay key={roadmapDay.day} day={roadmapDay} />
                                 ))}
                             </div>
                         </section>
