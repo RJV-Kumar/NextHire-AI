@@ -1,6 +1,6 @@
 # NextHire AI Frontend
 
-React + Vite frontend for NextHire AI, an interview preparation app that turns a job description and resume into a personalized prep plan.
+React + Vite frontend for NextHire AI, an interview prep app that turns a job description and resume into a personalized prep plan.
 
 ## Scripts
 
@@ -11,7 +11,7 @@ React + Vite frontend for NextHire AI, an interview preparation app that turns a
 
 ## Public assets
 
-- `/public/favicon.svg` is the app favicon used in the browser tab.
+- `/public/favicon.svg` is the favicon used in the browser tab.
 - `/public/images/portfolio/next-hire-ai-cover.svg` is a social preview and portfolio cover asset.
 - `/public/images/portfolio/next-hire-ai-thumbnail.svg` is a compact portfolio thumbnail for listings or case study cards.
 
